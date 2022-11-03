@@ -8,10 +8,13 @@ bool processCommandLine(const std::vector<std::string>& args,
                         bool& helpRequested,
                         bool& versionRequested,
                         std::string& inputFileName,
-                        std::string& outputFileName ){
+                        std::string& outputFileName,
+                        std::string& cipherKey, 
+                        bool& encrypt ){
 
     // Convert the command-line arguments into a more easily usable form
     const std::size_t nCmdLineArgs{args.size()};
+
 
     // Process command line arguments - ignore zeroth element, as we know this
     // to be the program name and don't need to worry about it
@@ -46,7 +49,25 @@ bool processCommandLine(const std::vector<std::string>& args,
                 outputFileName = args[i + 1];
                 ++i;
             }
-        } else {
+        } else if (args[i] == "-k") {
+            // See if we have a caesar cipher
+            if (i == nCmdLineArgs - 1) {
+                std::cerr << "[error] -k requires a positive integer argument"
+                          << std::endl;
+                return false;
+                break;
+            } 
+            else {
+                // assign the value to the key
+                cipherKey = args[i + 1];
+                ++i;
+            }
+        } else if (args[i] == "--encrypt") {
+            encrypt = true;
+        } else if (args[i] == "--decrypt") {
+            encrypt = false;
+        }
+        else {
             // Have an unknown flag to output error message and return non-zero
             // exit status to indicate failure
             std::cerr << "[error] unknown argument '" << args[i]
